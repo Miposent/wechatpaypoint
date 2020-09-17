@@ -2,6 +2,10 @@
   "name": "Miposent/wechatpaypoint",
   "description": "This is the development of the WeChat payment point",
   "type": "library",
+  "keywords": [
+    "wechat",
+    "payment"
+  ],
   "authors": [
     {
       "name": "Ain't",
