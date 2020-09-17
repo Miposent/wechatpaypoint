@@ -1,0 +1,19 @@
+{
+  "name": "Miposent/wechatpaypoint",
+  "description": "This is the development of the WeChat payment point",
+  "type": "library",
+  "authors": [
+    {
+      "name": "Ain't",
+      "email": "782452789@qq.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "WxPayPoint\\": "src/"
+    }
+  }
+}
