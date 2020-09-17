@@ -16,7 +16,7 @@
 ## Installation
 
 ```shell
-$ composer require "miposent/wechatpaypoint" 
+$ composer require miposent/wechatpaypoint
 ```
 
 ## Usage
