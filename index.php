@@ -1,5 +1,6 @@
 <?php
 
+use WxPayPoint\Handle\NotifyHandle;
 use WxPayPoint\Request\WxPayPointRequest;
 
 require './vendor/autoload.php';
@@ -16,22 +17,20 @@ $config = [
 	'public_key'  => dirname( __FILE__ ) . '/storage/cert/apiclient_cert.pem',
 ];
 $app = WxPayPointRequest::getInstance( $config );
-$data = $app->openidTerminate( [
-//	'out_order_no'         => '202009171036252525',
-//	'appid'              => 'wx0f3a4b0dcafec7fd',
-//	'authorization_code' => '1234323JKHDFE1243252',
-//	'notify_url'         => 'https://www.baidu.com'
-	'openid' => 'odEmw4u14ldfZkzsGJ0kTd37hU_M',
-	'reason' => '太初了'
-//	'service_introduction' => '谋谟酒店',
-//	'post_payments'        => [
-//		'name'   => '租借服务',
-//		'amount' => 100
-//	],
-//	'time_range'           => [
-//		'start_time' => date( "YmdHis" )
-//	],
-//	'total_amount'         => 100
-] );
+$param = [
+	'out_order_no'         => '202009171036252525',
+	'service_introduction' => '租借飞机服务',
+	'time_range'           => [
+		'start_time' => date( "YmdHis" )
+	],
+	'risk_fund'            => [
+		'name'   => 'DEPOSIT',
+		'amount' => 9900,
+	],
+	'notify_url'           => 'https://www.baidu.com'
+];
+$data = $app->syncBill($param);
+
+return NotifyHandle::sendFailReturn("FAIL","ORDER_ERROR");
 
 var_dump( $data );
