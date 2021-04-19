@@ -154,6 +154,18 @@ $data = $app->payBill($param);
 $data = $app->syncBill($param);
 ```
 
+公共API中的<a href="https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter6_1_26.shtml">申请退款API</a>:
+
+```php
+$data = $app->applyRefund($param);
+```
+
+公共API中的<a href="https://pay.weixin.qq.com/wiki/doc/apiv3/apis/chapter6_1_27.shtml">查询单笔退款API</a>:
+
+```php
+$data = $app->queryRefund($param);
+```
+
 异步通知操作静态类
 
 异步通知参数解密:

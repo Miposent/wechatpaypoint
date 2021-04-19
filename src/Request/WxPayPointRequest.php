@@ -2,6 +2,7 @@
 
 namespace WxPayPoint\Request;
 
+use WxPayPoint\Service\ApplyRefundService;
 use WxPayPoint\Service\AuthCodePermissionService;
 use WxPayPoint\Service\AuthCodeTerminateService;
 use WxPayPoint\Service\CancelBillService;
@@ -17,6 +18,7 @@ use WxPayPoint\Service\QueryBillService;
 use WxPayPoint\Handle\CurlHandle;
 use WxPayPoint\Handle\StockHandle;
 use WxPayPoint\Interfacer\WxPayPointInterface;
+use WxPayPoint\Service\QueryRefundService;
 use WxPayPoint\Service\SyncBillService;
 use WxPayPoint\Service\TerminateService;
 use WxPayPoint\Service\UserServiceStateService;
@@ -110,9 +112,9 @@ class WxPayPointRequest extends WxPayRequest implements WxPayPointInterface
 	
 	/**
 	 * 创建支付分订单
-	 *
-	 * @param $param
+	 * @param array $param
 	 * @return array
+	 * @throws \Exception
 	 */
 	public function createBill ( array $param ) : array
 	{
@@ -136,9 +138,9 @@ class WxPayPointRequest extends WxPayRequest implements WxPayPointInterface
 	
 	/**
 	 * 查询支付分订单
-	 *
-	 * @param $param
-	 * @return array|mixed
+	 * @param array $param
+	 * @return array
+	 * @throws \Exception
 	 */
 	public function queryBill ( array $param ) : array
 	{
@@ -150,9 +152,9 @@ class WxPayPointRequest extends WxPayRequest implements WxPayPointInterface
 	
 	/**
 	 * 撤销支付分订单
-	 *
-	 * @param $param
-	 * @return array|mixed
+	 * @param array $param
+	 * @return array
+	 * @throws \Exception
 	 */
 	public function cancelBill ( array $param ) : array
 	{
@@ -165,9 +167,9 @@ class WxPayPointRequest extends WxPayRequest implements WxPayPointInterface
 	
 	/**
 	 * 修改支付分订单金额
-	 *
-	 * @param $param
-	 * @return array|mixed
+	 * @param array $param
+	 * @return array
+	 * @throws \Exception
 	 */
 	public function modifyBill ( array $param ) : array
 	{
@@ -179,9 +181,9 @@ class WxPayPointRequest extends WxPayRequest implements WxPayPointInterface
 	
 	/**
 	 * 完结支付分订单
-	 *
-	 * @param $param
-	 * @return array|mixed
+	 * @param array $param
+	 * @return array
+	 * @throws \Exception
 	 */
 	public function completeBill ( array $param ) : array
 	{
@@ -193,9 +195,9 @@ class WxPayPointRequest extends WxPayRequest implements WxPayPointInterface
 	
 	/**
 	 * 商户发起催收扣款
-	 *
-	 * @param $param
-	 * @return array|mixed
+	 * @param array $param
+	 * @return array
+	 * @throws \Exception
 	 */
 	public function payBill ( array $param ) : array
 	{
@@ -208,9 +210,9 @@ class WxPayPointRequest extends WxPayRequest implements WxPayPointInterface
 	
 	/**
 	 * 商户发起催收扣款
-	 *
-	 * @param $param
-	 * @return array|mixed
+	 * @param array $param
+	 * @return array
+	 * @throws \Exception
 	 */
 	public function syncBill ( array $param ) : array
 	{
@@ -226,6 +228,7 @@ class WxPayPointRequest extends WxPayRequest implements WxPayPointInterface
 	 * 创单结单合并
 	 * @param array $param
 	 * @return array
+	 * @throws \Exception
 	 */
 	public function directComplete ( array $param ) : array
 	{
@@ -240,6 +243,7 @@ class WxPayPointRequest extends WxPayRequest implements WxPayPointInterface
 	 * 查询用户授权状态
 	 * @param array $param
 	 * @return array
+	 * @throws \Exception
 	 */
 	public function userServiceState ( array $param ) : array
 	{
@@ -251,9 +255,10 @@ class WxPayPointRequest extends WxPayRequest implements WxPayPointInterface
 	}
 	
 	/**
-	 * 商户解除用户授权关系
+	 *  商户解除用户授权关系
 	 * @param array $param
 	 * @return array
+	 * @throws \Exception
 	 */
 	public function terminate ( array $param ) : array
 	{
@@ -265,9 +270,10 @@ class WxPayPointRequest extends WxPayRequest implements WxPayPointInterface
 	}
 	
 	/**
-	 * 商户预授权
+	 *  商户预授权
 	 * @param array $param
 	 * @return array
+	 * @throws \Exception
 	 */
 	public function permission ( array $param ) : array
 	{
@@ -282,6 +288,7 @@ class WxPayPointRequest extends WxPayRequest implements WxPayPointInterface
 	 * 查询与用户授权记录（授权协议号）
 	 * @param array $param
 	 * @return array
+	 * @throws \Exception
 	 */
 	public function authCodePermission ( array $param ) : array
 	{
@@ -296,6 +303,7 @@ class WxPayPointRequest extends WxPayRequest implements WxPayPointInterface
 	 * 解除用户授权关系（授权协议号）
 	 * @param array $param
 	 * @return array
+	 * @throws \Exception
 	 */
 	public function authCodeTerminate ( array $param ) : array
 	{
@@ -310,6 +318,7 @@ class WxPayPointRequest extends WxPayRequest implements WxPayPointInterface
 	 * 解除用户授权关系（openid）
 	 * @param array $param
 	 * @return array
+	 * @throws \Exception
 	 */
 	public function openidTerminate ( array $param ) : array
 	{
@@ -324,12 +333,40 @@ class WxPayPointRequest extends WxPayRequest implements WxPayPointInterface
 	 * 查询与用户授权记录（openid）
 	 * @param array $param
 	 * @return array
+	 * @throws \Exception
 	 */
 	public function openidPermission ( array $param ) : array
 	{
 		// TODO: Implement openidPermission() method.
 		$param = array_merge( $this->getConfig(), $param );
 		$service = new OpenidPermissionService( $param );
+		$header = $this->getWxPayHeader( $service->url, CurlHandle::GET, '' );
+		return $service->sendRequest( $header );
+	}
+	
+	/**
+	 * 申请退款
+	 * @param array $param
+	 * @return array
+	 * @throws \Exception
+	 */
+	public function applyRefund ( array $param ) : array
+	{
+		// TODO: Implement payBill() method.
+		$service = new ApplyRefundService( $param );
+		$header = $this->getWxPayHeader( $service->url, CurlHandle::POST, json_encode( $service->param ) );
+		return $service->sendRequest( $header );
+	}
+	
+	/**
+	 * 查询退款
+	 * @param array $param
+	 * @return array
+	 * @throws \Exception
+	 */
+	public function queryRefund ( array $param ) : array
+	{
+		$service = new QueryRefundService( $param );
 		$header = $this->getWxPayHeader( $service->url, CurlHandle::GET, '' );
 		return $service->sendRequest( $header );
 	}
